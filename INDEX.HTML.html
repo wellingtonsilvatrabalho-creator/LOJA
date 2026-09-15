@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Papelaria da Ana — Monte seu pedido</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF8F2;
+    --paper-line:#E4DCC8;
+    --ink:#1B2A4A;
+    --ink-soft:#5A6478;
+    --yellow:#FFC93C;
+    --mint:#3F9C90;
+    --coral:#FF6B5E;
+    --card:#FFFFFF;
+    --radius:14px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 100% 42px;
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    padding-bottom:90px;
+  }
+  header{
+    max-width:1000px;
+    margin:0 auto;
+    padding:56px 24px 28px;
+  }
+  .eyebrow{
+    font-family:'Caveat', cursive;
+    font-size:22px;
+    color:var(--coral);
+    transform:rotate(-2deg);
+    display:inline-block;
+    margin-bottom:6px;
+  }
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(32px, 5vw, 48px);
+    line-height:1.1;
+    max-width:640px;
+  }
+  header p{
+    margin-top:14px;
+    color:var(--ink-soft);
+    font-size:16px;
+    max-width:520px;
+    line-height:1.5;
+  }
+  main{
+    max-width:1000px;
+    margin:0 auto;
+    padding:0 24px;
+    display:grid;
+    grid-template-columns:1fr 320px;
+    gap:32px;
+    align-items:start;
+  }
+  .list{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .item{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:18px 20px;
+    border-bottom:1px solid var(--paper-line);
+  }
+  .item:last-child{border-bottom:none;}
+  .icon{
+    width:46px; height:46px;
+    flex-shrink:0;
+    border-radius:10px;
+    background:#F3EFE3;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .icon svg{width:24px; height:24px; stroke:var(--ink); fill:none; stroke-width:1.6;}
+  .item-info{flex:1; min-width:0;}
+  .item-info .name{font-weight:600; font-size:15px;}
+  .item-info .price{color:var(--ink-soft); font-size:13.5px; margin-top:2px;}
+  .stepper{
+    display:flex; align-items:center; gap:10px;
+    background:var(--paper);
+    border:1px solid var(--paper-line);
+    border-radius:999px;
+    padding:4px;
+  }
+  .stepper button{
+    width:28px; height:28px;
+    border-radius:50%;
+    border:none;
+    background:var(--card);
+    color:var(--ink);
+    font-size:16px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .15s ease;
+  }
+  .stepper button:hover{background:var(--yellow);}
+  .stepper span{
+    min-width:18px;
+    text-align:center;
+    font-weight:600;
+    font-size:14px;
+  }
+  aside{
+    position:sticky;
+    top:24px;
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:var(--radius);
+    padding:22px;
+  }
+  aside h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:19px;
+    margin-bottom:4px;
+  }
+  .cart-sub{color:var(--ink-soft); font-size:13px; margin-bottom:16px;}
+  #cart-lines{min-height:20px; margin-bottom:12px;}
+  .cart-line{
+    display:flex; justify-content:space-between;
+    font-size:13.5px;
+    padding:6px 0;
+    color:var(--ink);
+  }
+  .cart-line span:last-child{color:var(--ink-soft);}
+  .empty-note{
+    font-family:'Caveat', cursive;
+    font-size:18px;
+    color:var(--ink-soft);
+  }
+  .total-row{
+    display:flex; justify-content:space-between;
+    align-items:baseline;
+    border-top:1px dashed var(--paper-line);
+    padding-top:14px;
+    margin-top:6px;
+  }
+  .total-row span:first-child{font-size:14px; color:var(--ink-soft);}
+  .total-row span:last-child{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:22px;
+  }
+  #checkout-btn{
+    width:100%;
+    margin-top:16px;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:var(--mint);
+    color:#fff;
+    font-weight:600;
+    font-size:15px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:transform .12s ease, background .15s ease;
+  }
+  #checkout-btn:hover{background:#358A80;}
+  #checkout-btn:disabled{
+    background:#D9D4C6; color:#8A8577; cursor:not-allowed;
+  }
+  #checkout-btn:active:not(:disabled){transform:scale(0.98);}
+  .mobile-bar{
+    display:none;
+  }
+  @media (max-width: 760px){
+    main{grid-template-columns:1fr; gap:20px;}
+    aside{position:static;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="eyebrow">lista pronta, sem enrolação</span>
+  <h1>Escolha o material e o pedido já vai certinho pro WhatsApp.</h1>
+  <p>Marque as quantidades de cada item. No final, é só apertar em "Enviar pedido" — a mensagem chega pronta pra mim, com tudo separado.</p>
+</header>
+
+<main>
+  <div class="list" id="product-list"></div>
+
+  <aside>
+    <h2>Seu pedido</h2>
+    <p class="cart-sub" id="cart-count">Nenhum item ainda</p>
+    <div id="cart-lines"><p class="empty-note">vazio por enquanto...</p></div>
+    <div class="total-row">
+      <span>Total</span>
+      <span id="cart-total">R$ 0,00</span>
+    </div>
+    <button id="checkout-btn" disabled>Enviar pedido no WhatsApp</button>
+  </aside>
+</main>
+
+<script>
+/* =======================================================
+   CONFIGURAÇÃO — edite só esta parte para personalizar
+   ======================================================= */
+const CONFIG = {
+  // Coloque seu número com DDI 55 + DDD + número, sem espaços/traços
+  whatsappNumber: "5516999999999",
+  products: [
+    { name: "Caderno 96 folhas", price: 12.90, icon: "notebook" },
+    { name: "Caixa de lápis de cor (12 cores)", price: 15.50, icon: "pencilcase" },
+    { name: "Caneta esferográfica azul", price: 2.50, icon: "pen" },
+    { name: "Lápis grafite", price: 1.50, icon: "pencil" },
+    { name: "Borracha branca", price: 2.00, icon: "eraser" },
+    { name: "Apontador com depósito", price: 3.50, icon: "sharpener" },
+    { name: "Estojo escolar", price: 22.00, icon: "case" },
+    { name: "Régua 30cm", price: 3.00, icon: "ruler" },
+  ]
+};
+/* ======================================================= */
+
+const ICONS = {
+  notebook: '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><line x1="4" y1="7" x2="20" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/></svg>',
+  pencilcase: '<svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="10" rx="4"/><path d="M8 8V6a4 4 0 018 0v2"/></svg>',
+  pen: '<svg viewBox="0 0 24 24"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z"/><line x1="14" y1="7" x2="17" y2="10"/></svg>',
+  pencil: '<svg viewBox="0 0 24 24"><path d="M4 20l1-5L16 4l3 3L8 18l-4 2z"/><line x1="14.5" y1="6.5" x2="17.5" y2="9.5"/></svg>',
+  eraser: '<svg viewBox="0 0 24 24"><rect x="5" y="9" width="14" height="8" rx="2" transform="rotate(-8 12 13)"/><line x1="8" y1="17" x2="19" y2="17"/></svg>',
+  sharpener: '<svg viewBox="0 0 24 24"><path d="M6 4h8l5 8-5 8H6z"/><circle cx="10" cy="12" r="2.2"/></svg>',
+  case: '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>',
+  ruler: '<svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="6" rx="1"/><line x1="7" y1="9" x2="7" y2="12"/><line x1="11" y1="9" x2="11" y2="13"/><line x1="15" y1="9" x2="15" y2="12"/></svg>',
+};
+
+const cart = {}; // { productIndex: qty }
+
+function formatBRL(n){
+  return n.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+}
+
+function renderProducts(){
+  const list = document.getElementById('product-list');
+  list.innerHTML = CONFIG.products.map((p, i) => `
+    <div class="item">
+      <div class="icon">${ICONS[p.icon] || ''}</div>
+      <div class="item-info">
+        <div class="name">${p.name}</div>
+        <div class="price">${formatBRL(p.price)}</div>
+      </div>
+      <div class="stepper">
+        <button onclick="changeQty(${i}, -1)">−</button>
+        <span id="qty-${i}">0</span>
+        <button onclick="changeQty(${i}, 1)">+</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function changeQty(i, delta){
+  const current = cart[i] || 0;
+  const next = Math.max(0, current + delta);
+  if (next === 0) delete cart[i]; else cart[i] = next;
+  document.getElementById(`qty-${i}`).textContent = next;
+  renderCart();
+}
+
+function renderCart(){
+  const entries = Object.entries(cart);
+  const linesEl = document.getElementById('cart-lines');
+  const countEl = document.getElementById('cart-count');
+  const totalEl = document.getElementById('cart-total');
+  const btn = document.getElementById('checkout-btn');
+
+  if (entries.length === 0){
+    linesEl.innerHTML = '<p class="empty-note">vazio por enquanto...</p>';
+    countEl.textContent = 'Nenhum item ainda';
+    totalEl.textContent = formatBRL(0);
+    btn.disabled = true;
+    return;
+  }
+
+  let total = 0;
+  let totalItems = 0;
+  linesEl.innerHTML = entries.map(([i, qty]) => {
+    const p = CONFIG.products[i];
+    const subtotal = p.price * qty;
+    total += subtotal;
+    totalItems += qty;
+    return `<div class="cart-line"><span>${qty}x ${p.name}</span><span>${formatBRL(subtotal)}</span></div>`;
+  }).join('');
+
+  countEl.textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'itens'}`;
+  totalEl.textContent = formatBRL(total);
+  btn.disabled = false;
+}
+
+function sendOrder(){
+  const entries = Object.entries(cart);
+  if (entries.length === 0) return;
+
+  let total = 0;
+  let message = "Olá! Gostaria de fazer o seguinte pedido:\n\n";
+  entries.forEach(([i, qty]) => {
+    const p = CONFIG.products[i];
+    const subtotal = p.price * qty;
+    total += subtotal;
+    message += `${qty}x ${p.name} — ${formatBRL(subtotal)}\n`;
+  });
+  message += `\nTotal: ${formatBRL(total)}\n\nAguardo confirmação, obrigado(a)!`;
+
+  const url = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+}
+
+document.getElementById('checkout-btn').addEventListener('click', sendOrder);
+renderProducts();
+renderCart();
+</script>
+
+</body>
+</html>
