@@ -213,7 +213,7 @@ const CONFIG = {
   // Coloque seu número com DDI 55 + DDD + número, sem espaços/traços
   whatsappNumber: "5561985323525",
   products: [
-    { name: "Caderno 96 folhas", price: 12.90, icon: "notebook" },
+    { name: "Caderno 96 folhas", price: 12.90, icon: "notebook", images/CADERNO_STIFF_96_FOLHAS.jpg },
     { name: "Caixa de lápis de cor (12 cores)", price: 15.50, icon: "pencilcase" },
     { name: "Caneta esferográfica azul", price: 2.50, icon: "pen" },
     { name: "Lápis grafite", price: 1.50, icon: "pencil" },
@@ -246,7 +246,7 @@ function renderProducts(){
   const list = document.getElementById('product-list');
   list.innerHTML = CONFIG.products.map((p, i) => `
     <div class="item">
-      <div class="icon">${ICONS[p.icon] || ''}</div>
+      <div class="icon">${p.image ? `<img src="${p.image}" alt="${p.name}">` : (ICONS[p.icon] || '')}</div>
       <div class="item-info">
         <div class="name">${p.name}</div>
         <div class="price">${formatBRL(p.price)}</div>
