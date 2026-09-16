@@ -426,7 +426,7 @@ const CONFIG = {
 
   // Cole aqui o link CSV publicado da sua planilha do Google Sheets
   // (Arquivo > Compartilhar > Publicar na web > formato CSV)
-  sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWjpNPnVfktQ8BTHxHgiWnnoTMd2mA_5RO0JNZhRCcOHTVyclWdMQewtVnyJVXUVjFtYot2UAkhXNC/pub?output=csv",
+  sheetCsvUrl: "COLE_AQUI_O_LINK_CSV_DA_SUA_PLANILHA",
 
   products: [] // preenchido automaticamente a partir da planilha
 };
@@ -450,6 +450,18 @@ function normalize(str){
 
 function safeId(key){
   return key.replace(/::/g, '-c-').replace(/[^a-zA-Z0-9\-]/g, '_');
+}
+
+function escJs(str){
+  return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+function attrSafe(jsCode){
+  return jsCode.replace(/"/g, '&quot;');
+}
+
+function escapeHtml(str){
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 }
 
 /* --- Leitura e interpretação do CSV da planilha --- */
@@ -496,7 +508,9 @@ function buildProductsFromCSV(text){
       const price = parseFloat(priceRaw.replace(',', '.')) || 0;
       const image = idxImagem >= 0 && r[idxImagem] ? r[idxImagem].trim() : '';
       const colorsRaw = idxCores >= 0 ? (r[idxCores] || '').trim() : '';
-      const colors = colorsRaw ? colorsRaw.split(',').map(c => c.trim()).filter(Boolean) : null;
+      const colors = colorsRaw
+        ? colorsRaw.split(',').map(c => c.trim().replace(/^["']+|["']+$/g, '').trim()).filter(Boolean)
+        : null;
       const stockRaw = idxEstoque >= 0 ? (r[idxEstoque] || '').trim() : '';
       const stock = stockRaw === '' ? null : (parseInt(stockRaw, 10) || 0);
       return {
@@ -564,26 +578,30 @@ function renderProducts(filterText){
 
     const colorChips = p.colors ? `
       <div class="colors">
-        ${p.colors.map(c => `<button class="chip ${c === currentColor ? 'active' : ''}" onclick="selectColor(${i}, '${c.replace(/'/g, "\\'")}')">${c}</button>`).join('')}
+        ${p.colors.map(c => `<button class="chip ${c === currentColor ? 'active' : ''}" onclick="${attrSafe(`selectColor(${i}, '${escJs(c)}')`)}">${escapeHtml(c)}</button>`).join('')}
       </div>` : '';
 
     const stockNote = soldOut
       ? ''
       : (p.stock !== null ? `<div class="stock-note">${p.stock} em estoque</div>` : '');
 
+    const imgOnclick = p.image ? `onclick="${attrSafe(`openModal('${escJs(p.image)}', '${escJs(p.name)}', ${p.price})`)}"` : '';
+    const minusOnclick = attrSafe(`changeQty('${escJs(key)}', -1, ${maxJs})`);
+    const plusOnclick = attrSafe(`changeQty('${escJs(key)}', 1, ${maxJs})`);
+
     return `
     <div class="item ${soldOut ? 'sold-out' : ''}">
-      <div class="icon ${p.image ? 'clickable' : ''}" ${p.image ? `onclick="openModal('${p.image}', '${p.name}', ${p.price})"` : ''}>${p.image ? `<img src="${p.image}" alt="${p.name}">` : (ICONS[p.icon] || '')}</div>
+      <div class="icon ${p.image ? 'clickable' : ''}" ${imgOnclick}>${p.image ? `<img src="${p.image}" alt="${escapeHtml(p.name)}">` : (ICONS[p.icon] || '')}</div>
       <div class="item-info">
-        <div class="name">${p.name} ${soldOut ? '<span class="badge-sold-out">Esgotado</span>' : ''}</div>
+        <div class="name">${escapeHtml(p.name)} ${soldOut ? '<span class="badge-sold-out">Esgotado</span>' : ''}</div>
         <div class="price">${formatBRL(p.price)}</div>
         ${stockNote}
         ${colorChips}
       </div>
       <div class="stepper">
-        <button onclick="changeQty('${key}', -1, ${maxJs})" ${soldOut ? 'disabled' : ''}>−</button>
+        <button onclick="${minusOnclick}" ${soldOut ? 'disabled' : ''}>−</button>
         <span id="qty-${safeId(key)}">${qty}</span>
-        <button onclick="changeQty('${key}', 1, ${maxJs})" ${soldOut ? 'disabled' : ''}>+</button>
+        <button onclick="${plusOnclick}" ${soldOut ? 'disabled' : ''}>+</button>
       </div>
     </div>
   `;
