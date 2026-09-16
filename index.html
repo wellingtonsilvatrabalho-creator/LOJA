@@ -86,7 +86,27 @@
     display:flex; align-items:center; justify-content:center;
   }
   .icon img{width:100%; height:100%; object-fit:cover; border-radius:10px;}
-  .icon.clickable{cursor:zoom-in;} .modal{display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(27,42,74,0.85); z-index:999; align-items:center; justify-content:center; padding:24px;} .modal.active{display:flex;} .modal-content{background:#fff; border-radius:14px; max-width:420px; width:100%; overflow:hidden;} .modal-content img{width:100%; display:block;} .modal-info{padding:18px 20px;} .modal-info .name{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:18px;} .modal-info .price{color:var(--ink-soft); margin-top:6px; font-size:15px;}
+  .icon.clickable{cursor:zoom-in;}
+  .modal{
+    display:none;
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(27,42,74,0.85);
+    z-index:999;
+    align-items:center; justify-content:center;
+    padding:24px;
+  }
+  .modal.active{display:flex;}
+  .modal-content{
+    background:#fff;
+    border-radius:14px;
+    max-width:420px;
+    width:100%;
+    overflow:hidden;
+  }
+  .modal-content img{width:100%; display:block;}
+  .modal-info{padding:18px 20px;}
+  .modal-info .name{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:18px;}
+  .modal-info .price{color:var(--ink-soft); margin-top:6px; font-size:15px;}
   .item-info{flex:1; min-width:0;}
   .item-info .name{font-weight:600; font-size:15px;}
   .item-info .price{color:var(--ink-soft); font-size:13.5px; margin-top:2px;}
@@ -205,7 +225,16 @@
     <button id="checkout-btn" disabled>Enviar pedido no WhatsApp</button>
   </aside>
 </main>
-  <div class="modal" id="image-modal" onclick="closeModal()"> <div class="modal-content" onclick="event.stopPropagation()"> <img id="modal-img" src="" alt=""> <div class="modal-info"> <div class="name" id="modal-name"></div> <div class="price" id="modal-price"></div> </div> </div> </div>
+
+<div class="modal" id="image-modal" onclick="closeModal()">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <img id="modal-img" src="" alt="">
+    <div class="modal-info">
+      <div class="name" id="modal-name"></div>
+      <div class="price" id="modal-price"></div>
+    </div>
+  </div>
+</div>
 
 <script>
 /* =======================================================
@@ -300,7 +329,17 @@ function renderCart(){
   btn.disabled = false;
 }
 
-  function openModal(image, name, price){ document.getElementById('modal-img').src = image; document.getElementById('modal-name').textContent = name; document.getElementById('modal-price').textContent = formatBRL(price); document.getElementById('image-modal').classList.add('active'); } function closeModal(){ document.getElementById('image-modal').classList.remove('active'); } Depois disso, desce até o fim da página e clica em "Commit changes...".
+function openModal(image, name, price){
+  document.getElementById('modal-img').src = image;
+  document.getElementById('modal-name').textContent = name;
+  document.getElementById('modal-price').textContent = formatBRL(price);
+  document.getElementById('image-modal').classList.add('active');
+}
+
+function closeModal(){
+  document.getElementById('image-modal').classList.remove('active');
+}
+
 function sendOrder(){
   const entries = Object.entries(cart);
   if (entries.length === 0) return;
