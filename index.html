@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Papelaria da Facil — Monte seu pedido</title>
+<title>Papelaria Facil — Monte seu pedido</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
 <style>
@@ -143,12 +143,37 @@
     border-radius:14px;
     max-width:420px;
     width:100%;
-    overflow:hidden;
+    max-height:85vh;
+    overflow-y:auto;
   }
   .modal-content img{width:100%; display:block;}
   .modal-info{padding:18px 20px;}
   .modal-info .name{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:18px;}
   .modal-info .price{color:var(--ink-soft); margin-top:6px; font-size:15px;}
+  .cart-modal-body{padding:22px;}
+  .cart-modal-body h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:19px;
+    margin-bottom:14px;
+  }
+  .cart-modal-actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:18px;
+  }
+  .cart-modal-actions button{
+    width:100%;
+    padding:13px;
+    border-radius:10px;
+    font-weight:600;
+    font-size:14.5px;
+    cursor:pointer;
+    border:none;
+  }
+  .btn-primary{background:var(--mint); color:#fff;}
+  .btn-primary:hover{background:#358A80;}
+  .btn-secondary{background:var(--paper); color:var(--ink); border:1px solid var(--paper-line) !important;}
   .item-info{flex:1; min-width:0;}
   .item-info .name{font-weight:600; font-size:15px;}
   .item-info .price{color:var(--ink-soft); font-size:13.5px; margin-top:2px;}
@@ -287,6 +312,7 @@
       display:flex;
       flex-direction:column;
       gap:2px;
+      cursor:pointer;
     }
     .mobile-bar-count{
       font-size:12px;
@@ -347,11 +373,11 @@
 
 <!-- Barra fixa que aparece só no celular -->
 <div class="mobile-bar">
-  <div class="mobile-bar-info">
+  <div class="mobile-bar-info" onclick="openCartModal()">
     <span class="mobile-bar-count" id="mobile-cart-count">Nenhum item ainda</span>
     <span class="mobile-bar-total" id="mobile-cart-total">R$ 0,00</span>
   </div>
-  <button id="mobile-checkout-btn" disabled>Enviar pedido</button>
+  <button id="mobile-checkout-btn" onclick="openCartModal()" disabled>Ver pedido</button>
 </div>
 
 <div class="modal" id="image-modal" onclick="closeModal()">
@@ -360,6 +386,24 @@
     <div class="modal-info">
       <div class="name" id="modal-name"></div>
       <div class="price" id="modal-price"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Janela de revisão do pedido antes de enviar -->
+<div class="modal" id="cart-modal" onclick="closeCartModal()">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="cart-modal-body">
+      <h3>Seu pedido</h3>
+      <div id="cart-modal-lines"><p class="empty-note">vazio por enquanto...</p></div>
+      <div class="total-row">
+        <span>Total</span>
+        <span id="cart-modal-total">R$ 0,00</span>
+      </div>
+      <div class="cart-modal-actions">
+        <button class="btn-primary" onclick="sendOrder(); closeCartModal();">Enviar pedido no WhatsApp</button>
+        <button class="btn-secondary" onclick="closeCartModal()">Continuar comprando</button>
+      </div>
     </div>
   </div>
 </div>
@@ -503,6 +547,8 @@ function renderCart(){
   const mobileCountEl = document.getElementById('mobile-cart-count');
   const mobileTotalEl = document.getElementById('mobile-cart-total');
   const mobileBtn = document.getElementById('mobile-checkout-btn');
+  const modalLinesEl = document.getElementById('cart-modal-lines');
+  const modalTotalEl = document.getElementById('cart-modal-total');
 
   if (entries.length === 0){
     linesEl.innerHTML = '<p class="empty-note">vazio por enquanto...</p>';
@@ -512,12 +558,14 @@ function renderCart(){
     mobileCountEl.textContent = 'Nenhum item ainda';
     mobileTotalEl.textContent = formatBRL(0);
     mobileBtn.disabled = true;
+    modalLinesEl.innerHTML = '<p class="empty-note">vazio por enquanto...</p>';
+    modalTotalEl.textContent = formatBRL(0);
     return;
   }
 
   let total = 0;
   let totalItems = 0;
-  linesEl.innerHTML = entries.map(([key, qty]) => {
+  const linesHtml = entries.map(([key, qty]) => {
     const [iStr, color] = key.split('::');
     const p = CONFIG.products[iStr];
     const label = color ? `${p.name} (${color})` : p.name;
@@ -527,6 +575,9 @@ function renderCart(){
     return `<div class="cart-line"><span>${qty}x ${label}</span><span>${formatBRL(subtotal)}</span></div>`;
   }).join('');
 
+  linesEl.innerHTML = linesHtml;
+  modalLinesEl.innerHTML = linesHtml;
+
   const countText = `${totalItems} ${totalItems === 1 ? 'item' : 'itens'}`;
   countEl.textContent = countText;
   totalEl.textContent = formatBRL(total);
@@ -535,6 +586,8 @@ function renderCart(){
   mobileCountEl.textContent = countText;
   mobileTotalEl.textContent = formatBRL(total);
   mobileBtn.disabled = false;
+
+  modalTotalEl.textContent = formatBRL(total);
 }
 
 function openModal(image, name, price){
@@ -546,6 +599,15 @@ function openModal(image, name, price){
 
 function closeModal(){
   document.getElementById('image-modal').classList.remove('active');
+}
+
+function openCartModal(){
+  if (Object.keys(cart).length === 0) return;
+  document.getElementById('cart-modal').classList.add('active');
+}
+
+function closeCartModal(){
+  document.getElementById('cart-modal').classList.remove('active');
 }
 
 function sendOrder(){
@@ -569,7 +631,6 @@ function sendOrder(){
 }
 
 document.getElementById('checkout-btn').addEventListener('click', sendOrder);
-document.getElementById('mobile-checkout-btn').addEventListener('click', sendOrder);
 renderProducts('');
 renderCart();
 </script>
