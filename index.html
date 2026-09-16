@@ -152,12 +152,36 @@
   .item-info{flex:1; min-width:0;}
   .item-info .name{font-weight:600; font-size:15px;}
   .item-info .price{color:var(--ink-soft); font-size:13.5px; margin-top:2px;}
+  .colors{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:8px;
+  }
+  .chip{
+    padding:5px 11px;
+    border-radius:999px;
+    border:1px solid var(--paper-line);
+    background:var(--paper);
+    font-size:12.5px;
+    font-family:'Inter', sans-serif;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .chip:hover{border-color:var(--mint);}
+  .chip.active{
+    background:var(--ink);
+    color:#fff;
+    border-color:var(--ink);
+  }
   .stepper{
     display:flex; align-items:center; gap:10px;
     background:var(--paper);
     border:1px solid var(--paper-line);
     border-radius:999px;
     padding:4px;
+    flex-shrink:0;
   }
   .stepper button{
     width:28px; height:28px;
@@ -285,66 +309,39 @@
 <script>
 /* =======================================================
    CONFIGURAÇÃO — edite só esta parte para personalizar
+
+   Para dar opção de cor num produto, adicione um campo
+   "colors" com a lista de cores, por exemplo:
+   colors: ["Azul", "Rosa", "Verde"]
+
+   Produtos sem esse campo continuam sem opção de cor.
    ======================================================= */
 const CONFIG = {
   // Coloque seu número com DDI 55 + DDD + número, sem espaços/traços
   whatsappNumber: "5561985323525",
   products: [
-    { name: "Caderno Stiff 96 folhas", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Caderno Stiff 96 folhas", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg", colors: ["Azul", "Rosa", "Verde"] },
     { name: "Caixa de lápis de cor (12 cores) da Cis", price: 15.50, icon: "notebook", image: "images/LAPIS_DA_CIS.jpg" },
-    { name: "Caneta esferográfica azul", price: 2.50, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Borracha branca", price: 1.50, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Apontador com depósito", price: 2.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Estojo escolar", price: 3.50, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Régua 30cm", price: 22.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Caderno", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Caderno de desenho", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Caderno de caligrafia", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Lápis preto", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Lápis de cor", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Canetinhas", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Caneta azul, preta e vermelha", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Borracha", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Apontador", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Régua", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Cola branca", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Cola bastão", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Tesoura sem ponta", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Giz de cera", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Estojo", price: 12.90, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Mochila", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Pasta", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Fichário", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Separadores", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Etiquetas escolares", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Agenda", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Planner", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Papel sulfite A4", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Papel colorido", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Cartolina", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Papel cartão", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Papel crepom", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "EVA", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Tinta guache", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Pincéis", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Massa de modelar", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Glitter", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Régua", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Esquadro", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Transferidor", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Compasso", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Calculadora", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Caderno quadriculado", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Folhas A4", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Papel fotográfico", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Papel vegetal", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Plástico para encapar", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Contact", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Fita adesiva", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Corretivo", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Grampeador", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Grampos", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
-    { name: "Clips", price: 3.00, icon: "notebook", image: "images/FOTO_EM_BREVE.jpg" },
+    { name: "Caneta esferográfica azul", price: 2.50, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Borracha branca", price: 1.50, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Apontador com depósito", price: 2.00, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Estojo escolar", price: 3.50, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Régua 30cm", price: 22.00, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Caderno", price: 3.00, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Caderno de desenho", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Caderno de caligrafia", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Lápis preto", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Lápis de cor", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Canetinhas", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Caneta azul, preta e vermelha", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Borracha", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Apontador", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Régua", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Cola branca", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Cola bastão", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Tesoura sem ponta", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Giz de cera", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
+    { name: "Marca-texto", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
   ]
 };
 /* ======================================================= */
@@ -360,7 +357,9 @@ const ICONS = {
   ruler: '<svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="6" rx="1"/><line x1="7" y1="9" x2="7" y2="12"/><line x1="11" y1="9" x2="11" y2="13"/><line x1="15" y1="9" x2="15" y2="12"/></svg>',
 };
 
-const cart = {}; // { productIndex: qty }
+const cart = {};        // { key: qty }  key = "i" ou "i::Cor"
+const activeColor = {}; // { i: "Cor selecionada" }
+let currentFilter = '';
 
 function formatBRL(n){
   return n.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
@@ -370,8 +369,24 @@ function normalize(str){
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
+function safeId(key){
+  return key.replace(/::/g, '-c-').replace(/[^a-zA-Z0-9\-]/g, '_');
+}
+
+function getKey(i, p){
+  if (!p.colors) return `${i}`;
+  const color = activeColor[i] || p.colors[0];
+  return `${i}::${color}`;
+}
+
+function selectColor(i, color){
+  activeColor[i] = color;
+  renderProducts(currentFilter);
+}
+
 function renderProducts(filterText){
-  const term = normalize(filterText || '');
+  currentFilter = filterText || '';
+  const term = normalize(currentFilter);
   const list = document.getElementById('product-list');
 
   const filtered = CONFIG.products
@@ -385,29 +400,38 @@ function renderProducts(filterText){
 
   list.innerHTML = filtered.map(p => {
     const i = p.i;
-    const qty = cart[i] || 0;
+    const key = getKey(i, p);
+    const qty = cart[key] || 0;
+    const currentColor = p.colors ? (activeColor[i] || p.colors[0]) : null;
+
+    const colorChips = p.colors ? `
+      <div class="colors">
+        ${p.colors.map(c => `<button class="chip ${c === currentColor ? 'active' : ''}" onclick="selectColor(${i}, '${c.replace(/'/g, "\\'")}')">${c}</button>`).join('')}
+      </div>` : '';
+
     return `
     <div class="item">
       <div class="icon ${p.image ? 'clickable' : ''}" ${p.image ? `onclick="openModal('${p.image}', '${p.name}', ${p.price})"` : ''}>${p.image ? `<img src="${p.image}" alt="${p.name}">` : (ICONS[p.icon] || '')}</div>
       <div class="item-info">
         <div class="name">${p.name}</div>
         <div class="price">${formatBRL(p.price)}</div>
+        ${colorChips}
       </div>
       <div class="stepper">
-        <button onclick="changeQty(${i}, -1)">−</button>
-        <span id="qty-${i}">${qty}</span>
-        <button onclick="changeQty(${i}, 1)">+</button>
+        <button onclick="changeQty('${key}', -1)">−</button>
+        <span id="qty-${safeId(key)}">${qty}</span>
+        <button onclick="changeQty('${key}', 1)">+</button>
       </div>
     </div>
   `;
   }).join('');
 }
 
-function changeQty(i, delta){
-  const current = cart[i] || 0;
+function changeQty(key, delta){
+  const current = cart[key] || 0;
   const next = Math.max(0, current + delta);
-  if (next === 0) delete cart[i]; else cart[i] = next;
-  const qtyEl = document.getElementById(`qty-${i}`);
+  if (next === 0) delete cart[key]; else cart[key] = next;
+  const qtyEl = document.getElementById(`qty-${safeId(key)}`);
   if (qtyEl) qtyEl.textContent = next;
   renderCart();
 }
@@ -429,12 +453,14 @@ function renderCart(){
 
   let total = 0;
   let totalItems = 0;
-  linesEl.innerHTML = entries.map(([i, qty]) => {
-    const p = CONFIG.products[i];
+  linesEl.innerHTML = entries.map(([key, qty]) => {
+    const [iStr, color] = key.split('::');
+    const p = CONFIG.products[iStr];
+    const label = color ? `${p.name} (${color})` : p.name;
     const subtotal = p.price * qty;
     total += subtotal;
     totalItems += qty;
-    return `<div class="cart-line"><span>${qty}x ${p.name}</span><span>${formatBRL(subtotal)}</span></div>`;
+    return `<div class="cart-line"><span>${qty}x ${label}</span><span>${formatBRL(subtotal)}</span></div>`;
   }).join('');
 
   countEl.textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'itens'}`;
@@ -459,11 +485,13 @@ function sendOrder(){
 
   let total = 0;
   let message = "Olá! Gostaria de fazer o seguinte pedido:\n\n";
-  entries.forEach(([i, qty]) => {
-    const p = CONFIG.products[i];
+  entries.forEach(([key, qty]) => {
+    const [iStr, color] = key.split('::');
+    const p = CONFIG.products[iStr];
+    const label = color ? `${p.name} (${color})` : p.name;
     const subtotal = p.price * qty;
     total += subtotal;
-    message += `${qty}x ${p.name} — ${formatBRL(subtotal)}\n`;
+    message += `${qty}x ${label} — ${formatBRL(subtotal)}\n`;
   });
   message += `\nTotal: ${formatBRL(total)}\n\nAguardo confirmação, obrigado(a)!`;
 
