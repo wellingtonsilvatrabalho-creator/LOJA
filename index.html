@@ -55,6 +55,39 @@
     max-width:520px;
     line-height:1.5;
   }
+  .search-wrap{
+    max-width:1000px;
+    margin:0 auto;
+    padding:0 24px 20px;
+  }
+  .search-box{
+    position:relative;
+    max-width:420px;
+  }
+  .search-box svg{
+    position:absolute;
+    left:14px; top:50%;
+    transform:translateY(-50%);
+    width:18px; height:18px;
+    stroke:var(--ink-soft);
+    fill:none;
+    stroke-width:1.8;
+    pointer-events:none;
+  }
+  #search-input{
+    width:100%;
+    padding:12px 14px 12px 40px;
+    border:1px solid var(--paper-line);
+    border-radius:999px;
+    background:var(--card);
+    font-family:'Inter', sans-serif;
+    font-size:14.5px;
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s ease;
+  }
+  #search-input:focus{border-color:var(--mint);}
+  #search-input::placeholder{color:var(--ink-soft);}
   main{
     max-width:1000px;
     margin:0 auto;
@@ -78,6 +111,15 @@
     border-bottom:1px solid var(--paper-line);
   }
   .item:last-child{border-bottom:none;}
+  .no-results{
+    padding:32px 20px;
+    text-align:center;
+  }
+  .no-results p{
+    font-family:'Caveat', cursive;
+    font-size:20px;
+    color:var(--ink-soft);
+  }
   .icon{
     width:46px; height:46px;
     flex-shrink:0;
@@ -194,9 +236,6 @@
     background:#D9D4C6; color:#8A8577; cursor:not-allowed;
   }
   #checkout-btn:active:not(:disabled){transform:scale(0.98);}
-  .mobile-bar{
-    display:none;
-  }
   @media (max-width: 760px){
     main{grid-template-columns:1fr; gap:20px;}
     aside{position:static;}
@@ -210,6 +249,13 @@
   <h1>Escolha o material e o pedido já vai certinho pro WhatsApp.</h1>
   <p>Marque as quantidades de cada item. No final, é só apertar em "Enviar pedido" — a mensagem chega pronta pra mim, com tudo separado.</p>
 </header>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search-input" placeholder="Buscar produto..." oninput="renderProducts(this.value)">
+  </div>
+</div>
 
 <main>
   <div class="list" id="product-list"></div>
@@ -265,7 +311,7 @@ const CONFIG = {
     { name: "Cola bastão", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
     { name: "Tesoura sem ponta", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
     { name: "Giz de cera", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
-    { name: "Marca-texto", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },						
+    { name: "Marca-texto", price: 12.90, icon: "notebook", image: "images/CADERNO_STIFF_96_FOLHAS.jpg" },
   ]
 };
 /* ======================================================= */
@@ -287,9 +333,27 @@ function formatBRL(n){
   return n.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
 }
 
-function renderProducts(){
+function normalize(str){
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function renderProducts(filterText){
+  const term = normalize(filterText || '');
   const list = document.getElementById('product-list');
-  list.innerHTML = CONFIG.products.map((p, i) => `
+
+  const filtered = CONFIG.products
+    .map((p, i) => ({ ...p, i }))
+    .filter(p => normalize(p.name).includes(term));
+
+  if (filtered.length === 0){
+    list.innerHTML = '<div class="no-results"><p>Nenhum produto encontrado...</p></div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(p => {
+    const i = p.i;
+    const qty = cart[i] || 0;
+    return `
     <div class="item">
       <div class="icon ${p.image ? 'clickable' : ''}" ${p.image ? `onclick="openModal('${p.image}', '${p.name}', ${p.price})"` : ''}>${p.image ? `<img src="${p.image}" alt="${p.name}">` : (ICONS[p.icon] || '')}</div>
       <div class="item-info">
@@ -298,18 +362,20 @@ function renderProducts(){
       </div>
       <div class="stepper">
         <button onclick="changeQty(${i}, -1)">−</button>
-        <span id="qty-${i}">0</span>
+        <span id="qty-${i}">${qty}</span>
         <button onclick="changeQty(${i}, 1)">+</button>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 function changeQty(i, delta){
   const current = cart[i] || 0;
   const next = Math.max(0, current + delta);
   if (next === 0) delete cart[i]; else cart[i] = next;
-  document.getElementById(`qty-${i}`).textContent = next;
+  const qtyEl = document.getElementById(`qty-${i}`);
+  if (qtyEl) qtyEl.textContent = next;
   renderCart();
 }
 
@@ -373,7 +439,7 @@ function sendOrder(){
 }
 
 document.getElementById('checkout-btn').addEventListener('click', sendOrder);
-renderProducts();
+renderProducts('');
 renderCart();
 </script>
 
