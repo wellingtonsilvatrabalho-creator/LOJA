@@ -210,6 +210,10 @@
     color:#fff;
     border-color:var(--ink);
   }
+  .chip-sold-out{
+    text-decoration:line-through;
+    opacity:0.55;
+  }
   .stepper{
     display:flex; align-items:center; gap:10px;
     background:var(--paper);
@@ -512,14 +516,30 @@ function buildProductsFromCSV(text){
         ? colorsRaw.split(',').map(c => c.trim().replace(/^["']+|["']+$/g, '').trim()).filter(Boolean)
         : null;
       const stockRaw = idxEstoque >= 0 ? (r[idxEstoque] || '').trim() : '';
-      const stock = stockRaw === '' ? null : (parseInt(stockRaw, 10) || 0);
+      let stock = null;
+      let stockByColor = null;
+      if (stockRaw !== ''){
+        if (stockRaw.includes(':')){
+          stockByColor = {};
+          stockRaw.split(',').forEach(pair => {
+            const idx = pair.indexOf(':');
+            if (idx === -1) return;
+            const colorKey = normalize(pair.slice(0, idx));
+            const qty = parseInt(pair.slice(idx + 1).trim(), 10);
+            if (colorKey) stockByColor[colorKey] = isNaN(qty) ? 0 : qty;
+          });
+        } else {
+          stock = parseInt(stockRaw, 10) || 0;
+        }
+      }
       return {
         name,
         price,
         icon: 'notebook',
         image: image || null,
         colors: (colors && colors.length) ? colors : null,
-        stock
+        stock,
+        stockByColor
       };
     });
 }
@@ -573,17 +593,24 @@ function renderProducts(filterText){
     const key = getKey(i, p);
     const qty = cart[key] || 0;
     const currentColor = p.colors ? (activeColor[i] || p.colors[0]) : null;
-    const soldOut = p.stock !== null && p.stock <= 0;
-    const maxJs = p.stock === null ? 'null' : p.stock;
+    const stockForKey = p.colors
+      ? (p.stockByColor ? (p.stockByColor[normalize(currentColor)] ?? null) : p.stock)
+      : p.stock;
+    const soldOut = stockForKey !== null && stockForKey <= 0;
+    const maxJs = stockForKey === null ? 'null' : stockForKey;
 
     const colorChips = p.colors ? `
       <div class="colors">
-        ${p.colors.map(c => `<button class="chip ${c === currentColor ? 'active' : ''}" onclick="${attrSafe(`selectColor(${i}, '${escJs(c)}')`)}">${escapeHtml(c)}</button>`).join('')}
+        ${p.colors.map(c => {
+          const cStock = p.stockByColor ? (p.stockByColor[normalize(c)] ?? null) : null;
+          const cSoldOut = cStock !== null && cStock <= 0;
+          return `<button class="chip ${c === currentColor ? 'active' : ''} ${cSoldOut ? 'chip-sold-out' : ''}" onclick="${attrSafe(`selectColor(${i}, '${escJs(c)}')`)}">${escapeHtml(c)}${cSoldOut ? ' (esgotado)' : ''}</button>`;
+        }).join('')}
       </div>` : '';
 
     const stockNote = soldOut
       ? ''
-      : (p.stock !== null ? `<div class="stock-note">${p.stock} em estoque</div>` : '');
+      : (stockForKey !== null ? `<div class="stock-note">${stockForKey} em estoque</div>` : '');
 
     const imgOnclick = p.image ? `onclick="${attrSafe(`openModal('${escJs(p.image)}', '${escJs(p.name)}', ${p.price})`)}"` : '';
     const minusOnclick = attrSafe(`changeQty('${escJs(key)}', -1, ${maxJs})`);
