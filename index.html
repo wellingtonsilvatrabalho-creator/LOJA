@@ -260,9 +260,58 @@
     background:#D9D4C6; color:#8A8577; cursor:not-allowed;
   }
   #checkout-btn:active:not(:disabled){transform:scale(0.98);}
+
+  /* Barra de carrinho fixa (só aparece no celular) */
+  .mobile-bar{
+    display:none;
+  }
+
   @media (max-width: 760px){
     main{grid-template-columns:1fr; gap:20px;}
-    aside{position:static;}
+    aside{display:none;} /* no celular, o carrinho lateral vira a barra fixa abaixo */
+
+    .mobile-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      position:fixed;
+      left:0; right:0; bottom:0;
+      background:var(--card);
+      border-top:1px solid var(--paper-line);
+      padding:12px 16px;
+      box-shadow:0 -4px 16px rgba(27,42,74,0.08);
+      z-index:500;
+    }
+    .mobile-bar-info{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .mobile-bar-count{
+      font-size:12px;
+      color:var(--ink-soft);
+    }
+    .mobile-bar-total{
+      font-family:'Space Grotesk', sans-serif;
+      font-weight:700;
+      font-size:18px;
+    }
+    .mobile-bar button{
+      flex-shrink:0;
+      padding:12px 18px;
+      border:none;
+      border-radius:10px;
+      background:var(--mint);
+      color:#fff;
+      font-weight:600;
+      font-size:14px;
+      cursor:pointer;
+    }
+    .mobile-bar button:disabled{
+      background:#D9D4C6; color:#8A8577; cursor:not-allowed;
+    }
+    body{padding-bottom:84px;} /* espaço pra barra fixa não tampar o fim da lista */
   }
 </style>
 </head>
@@ -295,6 +344,15 @@
     <button id="checkout-btn" disabled>Enviar pedido no WhatsApp</button>
   </aside>
 </main>
+
+<!-- Barra fixa que aparece só no celular -->
+<div class="mobile-bar">
+  <div class="mobile-bar-info">
+    <span class="mobile-bar-count" id="mobile-cart-count">Nenhum item ainda</span>
+    <span class="mobile-bar-total" id="mobile-cart-total">R$ 0,00</span>
+  </div>
+  <button id="mobile-checkout-btn" disabled>Enviar pedido</button>
+</div>
 
 <div class="modal" id="image-modal" onclick="closeModal()">
   <div class="modal-content" onclick="event.stopPropagation()">
@@ -442,12 +500,18 @@ function renderCart(){
   const countEl = document.getElementById('cart-count');
   const totalEl = document.getElementById('cart-total');
   const btn = document.getElementById('checkout-btn');
+  const mobileCountEl = document.getElementById('mobile-cart-count');
+  const mobileTotalEl = document.getElementById('mobile-cart-total');
+  const mobileBtn = document.getElementById('mobile-checkout-btn');
 
   if (entries.length === 0){
     linesEl.innerHTML = '<p class="empty-note">vazio por enquanto...</p>';
     countEl.textContent = 'Nenhum item ainda';
     totalEl.textContent = formatBRL(0);
     btn.disabled = true;
+    mobileCountEl.textContent = 'Nenhum item ainda';
+    mobileTotalEl.textContent = formatBRL(0);
+    mobileBtn.disabled = true;
     return;
   }
 
@@ -463,9 +527,14 @@ function renderCart(){
     return `<div class="cart-line"><span>${qty}x ${label}</span><span>${formatBRL(subtotal)}</span></div>`;
   }).join('');
 
-  countEl.textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'itens'}`;
+  const countText = `${totalItems} ${totalItems === 1 ? 'item' : 'itens'}`;
+  countEl.textContent = countText;
   totalEl.textContent = formatBRL(total);
   btn.disabled = false;
+
+  mobileCountEl.textContent = countText;
+  mobileTotalEl.textContent = formatBRL(total);
+  mobileBtn.disabled = false;
 }
 
 function openModal(image, name, price){
@@ -500,6 +569,7 @@ function sendOrder(){
 }
 
 document.getElementById('checkout-btn').addEventListener('click', sendOrder);
+document.getElementById('mobile-checkout-btn').addEventListener('click', sendOrder);
 renderProducts('');
 renderCart();
 </script>
